@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -95,5 +96,13 @@ public class ItemService {
 
     public Page<Item> searchItems(String query, Pageable pageable) {
         return itemRepository.findByNameContainingIgnoreCase(query, pageable);
+    }
+
+    public Page<Item> filterItems(String search, Long categoryId, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
+        return itemRepository.findWithFilters(search, categoryId, minPrice, maxPrice, pageable);
+    }
+
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
     }
 }

@@ -4,7 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProductService } from '../../core/services/product.service';
-import { Item } from '../../core/models';
+import { Item, Category } from '../../core/models';
+import { getProductImage, CATEGORY_IMAGES } from '../../core/utils/product-images';
 
 @Component({
   selector: 'app-home',
@@ -32,22 +33,17 @@ import { Item } from '../../core/models';
             Shop from thousands of verified sellers. Secure payments powered by Stripe. Fast delivery worldwide.
           </p>
 
-          <!-- Search bar -->
           <div class="flex gap-2 max-w-lg">
-            <input
-              [(ngModel)]="searchQuery"
-              (keyup.enter)="onSearch()"
-              type="text"
+            <input [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" type="text"
               placeholder="Search products..."
-              class="flex-1 px-5 py-3.5 rounded-xl text-gray-900 bg-white shadow-lg focus:outline-none focus:ring-2 focus:ring-accent-400 text-sm"
-            />
-            <button (click)="onSearch()" class="px-6 py-3.5 bg-accent-500 hover:bg-accent-600 rounded-xl font-semibold transition-colors shadow-lg text-sm whitespace-nowrap">
+              class="flex-1 px-5 py-3.5 rounded-xl text-gray-900 bg-white shadow-lg focus:outline-none focus:ring-2 focus:ring-accent-400 text-sm"/>
+            <button (click)="onSearch()"
+              class="px-6 py-3.5 bg-accent-500 hover:bg-accent-600 rounded-xl font-semibold transition-colors shadow-lg text-sm whitespace-nowrap">
               Search
             </button>
           </div>
         </div>
 
-        <!-- Stats row -->
         <div class="grid grid-cols-3 gap-6 mt-16 max-w-lg">
           @for (stat of stats; track stat.label) {
             <div class="text-center">
@@ -77,6 +73,31 @@ import { Item } from '../../core/models';
         </div>
       </div>
     </section>
+
+    <!-- Shop by Category -->
+    @if (categories().length > 0) {
+      <section class="py-16 bg-gray-50">
+        <div class="page-container">
+          <h2 class="section-title mb-2">Shop by Category</h2>
+          <p class="text-gray-500 text-sm mb-8">Browse our curated collections</p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            @for (cat of categories(); track cat.id) {
+              <a [routerLink]="['/products']" [queryParams]="{ category: cat.id }"
+                class="group relative rounded-2xl overflow-hidden h-32 block cursor-pointer">
+                <img [src]="getCategoryImage(cat.name)" [alt]="cat.name"
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  loading="lazy" (error)="onImgError($event)"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div class="absolute bottom-3 left-3">
+                  <p class="text-white font-semibold text-sm">{{ cat.name }}</p>
+                </div>
+              </a>
+            }
+          </div>
+        </div>
+      </section>
+    }
 
     <!-- Featured Products -->
     <section class="py-16">
@@ -112,12 +133,13 @@ import { Item } from '../../core/models';
           <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
             @for (product of products(); track product.id) {
               <a [routerLink]="['/products', product.id]" class="card-hover group block">
-                <!-- Product image placeholder -->
-                <div class="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
-                  <span class="text-5xl">🛍️</span>
+                <div class="relative w-full h-48 bg-gray-100 overflow-hidden">
+                  <img [src]="getImg(product)" [alt]="product.name"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy" (error)="onImgError($event)"/>
                   @if (product.quantity === 0) {
-                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
-                      <span class="badge bg-red-500 text-white">Out of Stock</span>
+                    <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <span class="bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Out of Stock</span>
                     </div>
                   }
                 </div>
@@ -128,7 +150,7 @@ import { Item } from '../../core/models';
                   </h3>
                   @if (product.averageRating) {
                     <div class="flex items-center gap-1 mt-1">
-                      <span class="star-rating text-xs">★★★★★</span>
+                      <span class="text-yellow-400 text-xs">★</span>
                       <span class="text-xs text-gray-500">{{ product.averageRating | number:'1.1-1' }}</span>
                     </div>
                   }
@@ -144,7 +166,7 @@ import { Item } from '../../core/models';
       </div>
     </section>
 
-    <!-- CTA Section -->
+    <!-- CTA -->
     <section class="bg-primary-600 py-16 text-white">
       <div class="page-container text-center">
         <h2 class="text-3xl font-bold mb-4">Ready to Start Selling?</h2>
@@ -163,13 +185,14 @@ export class HomeComponent implements OnInit {
   private router = inject(Router);
 
   products = signal<Item[]>([]);
+  categories = signal<Category[]>([]);
   loading = signal(true);
   searchQuery = '';
 
   stats = [
-    { value: '10K+', label: 'Products' },
-    { value: '500+', label: 'Sellers' },
-    { value: '50K+', label: 'Customers' },
+    { value: '24+', label: 'Products' },
+    { value: '8', label: 'Categories' },
+    { value: '3', label: 'Sellers' },
   ];
 
   features = [
@@ -179,11 +202,12 @@ export class HomeComponent implements OnInit {
   ];
 
   ngOnInit() {
+    this.productService.getPublicCategories().subscribe({
+      next: (cats) => this.categories.set(cats),
+      error: () => {}
+    });
     this.productService.getPublicProducts(0, 8).subscribe({
-      next: (page) => {
-        this.products.set(page.content);
-        this.loading.set(false);
-      },
+      next: (page) => { this.products.set(page.content); this.loading.set(false); },
       error: () => this.loading.set(false)
     });
   }
@@ -194,5 +218,16 @@ export class HomeComponent implements OnInit {
     } else {
       this.router.navigate(['/products']);
     }
+  }
+
+  getImg(product: Item): string { return getProductImage(product); }
+
+  getCategoryImage(name: string): string {
+    return CATEGORY_IMAGES[name] ?? 'https://images.unsplash.com/photo-1607082349566-187342175e2f?w=400&h=280&fit=crop&auto=format';
+  }
+
+  onImgError(event: Event) {
+    (event.target as HTMLImageElement).src =
+      'https://images.unsplash.com/photo-1607082349566-187342175e2f?w=400&h=280&fit=crop&auto=format';
   }
 }

@@ -13,6 +13,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequestMapping("/public")
 @RequiredArgsConstructor
@@ -27,10 +29,18 @@ public class PublicController {
     public ResponseEntity<Page<Item>> getAllItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "id") String sortBy
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return ResponseEntity.ok(itemService.getAllItems(pageable));
+        Sort sort = sortDir.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(itemService.filterItems(search, categoryId, minPrice, maxPrice, pageable));
     }
 
     @GetMapping("/items/{id}")
@@ -51,6 +61,11 @@ public class PublicController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(itemService.searchItems(query, pageable));
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<?> getAllCategories() {
+        return ResponseEntity.ok(itemService.getAllCategories());
     }
 
     @GetMapping("/sellers")

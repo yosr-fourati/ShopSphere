@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Item, Page, Feedback, FeedbackRequest, ItemRequest } from '../models';
+import { Item, Category, Page, Feedback, FeedbackRequest, ItemRequest } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
@@ -11,9 +11,30 @@ export class ProductService {
   constructor(private http: HttpClient) {}
 
   // Public endpoints
-  getPublicProducts(page = 0, size = 20): Observable<Page<Item>> {
-    const params = new HttpParams().set('page', page).set('size', size);
+  getPublicProducts(
+    page = 0,
+    size = 20,
+    search: string | null = null,
+    categoryId: number | null = null,
+    minPrice: number | null = null,
+    maxPrice: number | null = null,
+    sortBy = 'id',
+    sortDir = 'asc'
+  ): Observable<Page<Item>> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sortBy', sortBy)
+      .set('sortDir', sortDir);
+    if (search) params = params.set('search', search);
+    if (categoryId !== null) params = params.set('categoryId', categoryId);
+    if (minPrice !== null) params = params.set('minPrice', minPrice);
+    if (maxPrice !== null) params = params.set('maxPrice', maxPrice);
     return this.http.get<Page<Item>>(`${this.base}/public/items`, { params });
+  }
+
+  getPublicCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.base}/public/categories`);
   }
 
   searchPublicProducts(query: string, page = 0, size = 20): Observable<Page<Item>> {
