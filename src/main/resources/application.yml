@@ -4,7 +4,7 @@ spring:
   application:
     name: ShopSphere
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3307/TunisiCartDB}
+    url: ${DB_URL:jdbc:mysql://localhost:3307/ShopSphereDB}
     username: ${DB_USERNAME:aeisel}
     password: ${DB_PASSWORD:azerty}
     driver-class-name: com.mysql.cj.jdbc.Driver

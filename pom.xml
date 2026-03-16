@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.AeiselDev</groupId>
-	<artifactId>TunisiCart</artifactId>
+	<artifactId>ShopSphere</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ShopSphere</name>
 	<description>ShopSphere — Multi-seller e-commerce platform built with Spring Boot 3, JWT, and Stripe</description>

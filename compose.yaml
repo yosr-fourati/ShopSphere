@@ -3,7 +3,7 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_DATABASE: TunisiCartDB
+      MYSQL_DATABASE: ShopSphereDB
       MYSQL_USER: ${DB_USERNAME:-aeisel}
       MYSQL_PASSWORD: ${DB_PASSWORD:-azerty}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-toor}
