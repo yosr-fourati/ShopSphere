@@ -74,7 +74,7 @@ import { Item, Page } from '../../../core/models';
                     </div>
                   }
                   <div class="absolute top-2 left-2">
-                    <span class="badge badge-info text-xs">{{ product.category }}</span>
+                    <span class="badge badge-info text-xs">{{ product.category?.name }}</span>
                   </div>
                 </div>
               </a>

@@ -48,7 +48,7 @@ import { CartItem } from '../../core/models';
                 <!-- Info -->
                 <div class="flex-1 min-w-0">
                   <h3 class="font-semibold text-gray-900 truncate">{{ ci.item.name }}</h3>
-                  <p class="text-xs text-gray-400 mt-0.5">{{ ci.item.category }}</p>
+                  <p class="text-xs text-gray-400 mt-0.5">{{ ci.item.category?.name }}</p>
                   <p class="font-bold text-primary-600 mt-2">\${{ (ci.item.price * ci.quantity) | number:'1.2-2' }}</p>
                 </div>
 

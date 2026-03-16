@@ -93,7 +93,7 @@ type Tab = 'products' | 'orders' | 'add';
                 <div class="flex-1 min-w-0">
                   <h3 class="font-semibold text-gray-900 truncate">{{ product.name }}</h3>
                   <div class="flex items-center gap-3 mt-0.5">
-                    <span class="text-xs text-gray-400">{{ product.category }}</span>
+                    <span class="text-xs text-gray-400">{{ product.category?.name }}</span>
                     <span [class]="product.quantity > 0 ? 'badge-success' : 'badge-error'" class="badge">
                       {{ product.quantity > 0 ? product.quantity + ' in stock' : 'Out of stock' }}
                     </span>
@@ -290,7 +290,7 @@ export class SellerDashboardComponent implements OnInit {
       description: product.description,
       price: product.price,
       quantity: product.quantity,
-      category: product.category,
+      category: product.category?.name ?? '',
     };
     this.formError.set('');
     this.formSuccess.set('');

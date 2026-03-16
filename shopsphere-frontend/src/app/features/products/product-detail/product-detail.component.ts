@@ -52,7 +52,7 @@ import { Item, Feedback, FeedbackRequest } from '../../../core/models';
           <!-- Info -->
           <div>
             <div class="flex items-center gap-2 mb-2">
-              <span class="badge badge-info">{{ product()!.category }}</span>
+              <span class="badge badge-info">{{ product()!.category?.name }}</span>
               @if (product()!.quantity === 0) {
                 <span class="badge badge-error">Out of Stock</span>
               } @else {

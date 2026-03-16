@@ -122,7 +122,7 @@ import { Item } from '../../core/models';
                   }
                 </div>
                 <div class="p-4">
-                  <p class="text-xs text-primary-600 font-medium mb-1">{{ product.category }}</p>
+                  <p class="text-xs text-primary-600 font-medium mb-1">{{ product.category?.name }}</p>
                   <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 group-hover:text-primary-600 transition-colors">
                     {{ product.name }}
                   </h3>

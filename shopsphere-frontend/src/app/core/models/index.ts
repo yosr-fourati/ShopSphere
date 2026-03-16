@@ -8,13 +8,19 @@ export interface User {
   createdAt?: string;
 }
 
+export interface Category {
+  id: number;
+  name: string;
+  description: string;
+}
+
 export interface Item {
   id: number;
   name: string;
   description: string;
   price: number;
   quantity: number;
-  category: string;
+  category: Category;
   imageUrl?: string;
   seller?: User;
   averageRating?: number;
