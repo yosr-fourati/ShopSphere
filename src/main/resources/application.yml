@@ -2,7 +2,7 @@ spring:
   profiles:
     active: dev
   application:
-    name: TunisiCart
+    name: ShopSphere
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3307/TunisiCartDB}
     username: ${DB_USERNAME:aeisel}

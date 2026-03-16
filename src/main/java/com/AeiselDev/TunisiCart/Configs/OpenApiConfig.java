@@ -14,27 +14,23 @@ import io.swagger.v3.oas.annotations.servers.Server;
 @OpenAPIDefinition(
         info = @Info(
                 contact = @Contact(
-                        name = "Yosr fourati",
+                        name = "Yosr Fourati",
                         email = "yosr.fourati@oakland.edu",
-                        url = "https://oakland.joinhandshake.com/profiles/59943899"
+                        url = "https://github.com/yosr-fourati"
                 ),
-                description = "OpenApi documentation for Spring Security",
-                title = "OpenApi specification - YosrFourati",
+                description = "ShopSphere — Multi-seller e-commerce REST API. Built with Spring Boot 3, JWT authentication, role-based access control, and Stripe payments.",
+                title = "ShopSphere API",
                 version = "1.0",
                 license = @License(
-                        name = "Licence name",
-                        url = "https://some-url.com"
+                        name = "MIT License",
+                        url = "https://opensource.org/licenses/MIT"
                 ),
-                termsOfService = "Terms of service"
+                termsOfService = "https://github.com/yosr-fourati/ShopSphere"
         ),
         servers = {
                 @Server(
                         description = "Local ENV",
-                        url = "http://localhost:8089/api/v1"
-                ),
-                @Server(
-                        description = "PROD ENV",
-                        url = "https://www.linkedin.com/in/ismail-mabrouki-811a53164/"
+                        url = "http://localhost:8088/api/v1"
                 )
         },
         security = {

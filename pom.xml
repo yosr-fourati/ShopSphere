@@ -11,8 +11,8 @@
 	<groupId>com.AeiselDev</groupId>
 	<artifactId>TunisiCart</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>TunisiCartServer </name>
-	<description>Demo project for Spring Boot</description>
+	<name>ShopSphere</name>
+	<description>ShopSphere — Multi-seller e-commerce platform built with Spring Boot 3, JWT, and Stripe</description>
 	<properties>
 		<java.version>17</java.version>
 		<spring-modulith.version>1.2.0</spring-modulith.version>

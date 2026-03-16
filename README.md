@@ -1,115 +1,145 @@
-# TunisiCart 🛒
+# ShopSphere 🛒
 
-A multi-seller e-commerce REST API built with Spring Boot. Buyers can browse and purchase products, sellers manage their listings, and admins oversee the platform.
+> A production-grade multi-seller e-commerce platform built with **Spring Boot 3**, **Angular 17**, **JWT**, and **Stripe**.
 
-## Tech Stack
+[![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3.2-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
+[![Angular](https://img.shields.io/badge/Angular-17-red?logo=angular)](https://angular.io/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?logo=mysql)](https://www.mysql.com/)
+[![Stripe](https://img.shields.io/badge/Stripe-Payments-blueviolet?logo=stripe)](https://stripe.com/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-- **Java 22** + **Spring Boot 3.3.2**
-- **Spring Security 6** with JWT authentication
-- **Spring Data JPA** + **MySQL 8**
-- **Stripe** for payment processing
-- **Spring Mail** + **Thymeleaf** for email notifications
-- **SpringDoc OpenAPI** (Swagger UI)
-- **Docker Compose** for local infrastructure
+---
+
+## Overview
+
+**ShopSphere** is a full-stack marketplace where buyers can discover and purchase products, sellers can manage their storefronts, and admins oversee the entire platform.
+
+Designed with clean architecture, strong security, and scalability in mind — built by [Yosr Fourati](https://github.com/yosr-fourati), MS Software Engineering student at **Oakland University** (graduating April 2026).
+
+---
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────┐
+│                   Angular 17 Frontend                 │
+│           (Standalone Components · Tailwind CSS)      │
+└────────────────────────┬─────────────────────────────┘
+                         │ HTTP / REST
+┌────────────────────────▼─────────────────────────────┐
+│              Spring Boot 3 REST API                   │
+│        JWT Auth · Spring Security · Swagger UI        │
+└──────┬──────────────────────┬────────────────────────┘
+       │                      │
+  ┌────▼────┐           ┌─────▼──────┐
+  │ MySQL 8 │           │   Stripe   │
+  │  (JPA)  │           │  Payments  │
+  └─────────┘           └────────────┘
+```
+
+---
 
 ## Features
 
-- JWT-based authentication with email verification
-- Role-based access control: `USER`, `SELLER`, `ADMIN`
-- Product listings with categories, images, and reviews
-- Shopping cart and purchase orders
-- Stripe payment integration
-- Seller dashboard (manage listings)
-- Admin dashboard
-- Activity history tracking
+| Feature | Details |
+|---|---|
+| **Authentication** | JWT + refresh tokens, email verification flow |
+| **Role-based access** | `USER` · `SELLER` · `ADMIN` with method-level security |
+| **Product management** | CRUD listings, categories, image upload |
+| **Shopping cart** | Add/update/remove items, persistent per user |
+| **Orders** | Place orders, track delivery status |
+| **Payments** | Stripe PaymentIntent integration |
+| **Reviews** | Star ratings + comments per product |
+| **Pagination** | All list endpoints paginated (default 20/page) |
+| **Activity tracking** | View and purchase history per user |
+| **Admin dashboard** | User/role/item management + system stats |
+| **API Docs** | Interactive Swagger UI (OpenAPI 3) |
+
+---
+
+## Tech Stack
+
+**Backend**
+- Java 17 · Spring Boot 3.3.2
+- Spring Security 6 · JWT (JJWT)
+- Spring Data JPA · Hibernate · MySQL 8
+- Stripe Java SDK
+- SpringDoc OpenAPI (Swagger UI)
+- Lombok · Docker Compose
+
+**Frontend**
+- Angular 17 (Standalone Components)
+- Tailwind CSS · Angular Material
+- RxJS · Angular Router · HTTP Client
+
+---
 
 ## Getting Started
 
 ### Prerequisites
-
-- Java 22+
-- Maven 3.8+
+- Java 17+ · Maven
+- Node.js 20+ · npm
 - Docker & Docker Compose
 
-### Setup
+### Backend Setup
 
-1. **Clone the repo**
-   ```bash
-   git clone https://github.com/your-username/TunisiCart.git
-   cd TunisiCart
-   ```
+```bash
+git clone https://github.com/yosr-fourati/ShopSphere.git
+cd ShopSphere
+cp .env.example .env        # fill in your values
+docker compose up -d        # start MySQL + MailDev
+./mvnw spring-boot:run
+```
 
-2. **Configure environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env and fill in your values
-   ```
+- API: `http://localhost:8088/api/v1`
+- Swagger UI: `http://localhost:8088/api/v1/swagger-ui.html`
+- MailDev: `http://localhost:1080`
 
-3. **Start infrastructure (MySQL + MailDev)**
-   ```bash
-   docker compose up -d
-   ```
+### Frontend Setup
 
-4. **Run the application**
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-
-5. **Open Swagger UI**
-   ```
-   http://localhost:8088/api/v1/swagger-ui.html
-   ```
-
-6. **Open MailDev (email testing)**
-   ```
-   http://localhost:1080
-   ```
+```bash
+cd frontend
+npm install
+ng serve
+# App: http://localhost:4200
+```
 
 ### Environment Variables
 
-Copy `.env.example` to `.env` and fill in the required values:
-
 | Variable | Description |
 |---|---|
-| `DB_URL` | JDBC URL for MySQL |
-| `DB_USERNAME` | Database username |
-| `DB_PASSWORD` | Database password |
-| `JWT_SECRET` | Secret key for signing JWTs (min 32 chars) |
-| `JWT_EXPIRATION` | JWT token TTL in ms (default: 86400000 = 24h) |
-| `JWT_REFRESH_EXPIRATION` | Refresh token TTL in ms (default: 604800000 = 7d) |
-| `STRIPE_SECRET_KEY` | Stripe secret key from dashboard.stripe.com |
-| `MAIL_HOST` | SMTP host |
-| `FRONTEND_ACTIVATION_URL` | URL for email activation link |
+| `JWT_SECRET` | Min 32-char secret (`openssl rand -hex 32`) |
+| `STRIPE_SECRET_KEY` | From [Stripe Dashboard](https://dashboard.stripe.com/apikeys) |
+| `DB_URL` / `DB_USERNAME` / `DB_PASSWORD` | MySQL credentials |
+| `MAIL_HOST` / `MAIL_PORT` | SMTP config |
+| `FRONTEND_ACTIVATION_URL` | Email activation redirect URL |
+
+---
 
 ## API Overview
 
-| Base Path | Description | Auth |
+| Group | Base Path | Auth Required |
 |---|---|---|
-| `POST /api/v1/auth/register` | Register new account | Public |
-| `POST /api/v1/auth/authenticate` | Login | Public |
-| `GET /api/v1/public/items` | Browse all products | Public |
-| `GET /api/v1/public/items/search` | Search products | Public |
-| `GET /api/v1/seller/items` | Manage seller listings | SELLER |
-| `GET /api/v1/user/**` | User account actions | USER |
-| `GET /api/v1/admin/**` | Admin operations | ADMIN |
-| `POST /api/v1/payment/create-payment-intent` | Create Stripe payment | Auth |
+| Authentication | `/auth/**` | No |
+| Browse products | `/public/**` | No |
+| User actions | `/user/**` | USER role |
+| Seller dashboard | `/seller/**` | SELLER role |
+| Admin panel | `/admin/**` | ADMIN role |
+| Payments | `/payment/**` | Yes |
 
-Full docs available at `/api/v1/swagger-ui.html` when the app is running.
+Full docs at `/api/v1/swagger-ui.html`
 
-## Project Structure
+---
 
-```
-src/main/java/com/AeiselDev/TunisiCart/
-├── controllers/      REST controllers
-├── services/         Business logic
-├── repositories/     JPA repositories
-├── entities/         JPA entities
-├── security/         JWT + Spring Security config
-├── common/           DTOs (request/response)
-├── enums/            Enums (RoleType, DeliveryStatus…)
-└── Configs/          Spring configuration beans
-```
+## Author
+
+**Yosr Fourati** — MS Software Engineering · Oakland University · April 2026
+[GitHub](https://github.com/yosr-fourati) · yosr.fourati@oakland.edu
+
+---
 
 ## License
 
-MIT
+MIT © 2024–2026 Yosr Fourati
