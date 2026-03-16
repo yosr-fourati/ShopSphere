@@ -25,4 +25,13 @@ public class ActivityHistoryService {
         activity.setTimestamp(LocalDateTime.now());
         activityHistoryRepository.save(activity);
     }
+
+    public void recordPurchase(Long productId, Long userId) {
+        ActivityHistory activity = new ActivityHistory();
+        activity.setProductId(productId);
+        activity.setUserId(userId);
+        activity.setActionType("purchase");
+        activity.setTimestamp(LocalDateTime.now());
+        activityHistoryRepository.save(activity);
+    }
 }

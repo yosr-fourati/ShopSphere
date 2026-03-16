@@ -14,6 +14,7 @@ import com.AeiselDev.TunisiCart.services.ItemService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -99,8 +100,10 @@ public class AdminController {
     // Item Management Endpoints
 
     @GetMapping("/items")
-    public ResponseEntity<?> getAllItems() {
-        return ResponseEntity.ok(itemService.getAllItems());
+    public ResponseEntity<?> getAllItems(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(itemService.getAllItems(PageRequest.of(page, size)));
     }
 
     @GetMapping("/items/{id}")

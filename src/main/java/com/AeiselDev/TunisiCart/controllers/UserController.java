@@ -9,16 +9,14 @@ import com.AeiselDev.TunisiCart.entities.ActivityHistory;
 import com.AeiselDev.TunisiCart.entities.Feedback;
 import com.AeiselDev.TunisiCart.exception.ItemNotFoundException;
 import com.AeiselDev.TunisiCart.exception.UserNotFoundException;
-import com.AeiselDev.TunisiCart.repositories.ActivityHistoryRepository;
 import com.AeiselDev.TunisiCart.services.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +33,6 @@ public class UserController {
     private final FeedbackService feedbackService;
 
     private final ActivityHistoryService activityHistoryService;
-    private final ActivityHistoryRepository activityHistoryRepository;
 
 
     // Profile Endpoints
@@ -111,16 +108,8 @@ public class UserController {
             response.put("message", "Order placed successfully");
             // Record the activity history for each item
             if (request.getItem_id() != null) {
-                for (Long itemId : request.getItem_id()) {
-                    ActivityHistory activity = new ActivityHistory();
-                    activity.setProductId(itemId);
-                    activity.setActionType("purchase"); // Changed to "purchase"
-                    activity.setUserId(request.getUserId());
-                    // Optionally set timestamp if not handled by @PrePersist
-                    activity.setTimestamp(LocalDateTime.now());
-
-                    activityHistoryRepository.save(activity);
-                }
+                request.getItem_id().forEach(itemId ->
+                        activityHistoryService.recordPurchase(itemId, request.getUserId()));
             }
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -145,8 +134,10 @@ public class UserController {
     // Item Browsing Endpoints
 
     @GetMapping("/items")
-    public ResponseEntity<?> getAllItems() {
-        return ResponseEntity.ok(itemService.getAllItems());
+    public ResponseEntity<?> getAllItems(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(itemService.getAllItems(PageRequest.of(page, size)));
     }
 
     @GetMapping("/items/{id}")
@@ -155,8 +146,11 @@ public class UserController {
     }
 
     @GetMapping("/items/search")
-    public ResponseEntity<?> searchItems(@RequestParam String query) {
-        return ResponseEntity.ok(itemService.searchItems(query));
+    public ResponseEntity<?> searchItems(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(itemService.searchItems(query, PageRequest.of(page, size)));
     }
 
 

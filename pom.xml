@@ -14,7 +14,7 @@
 	<name>TunisiCartServer </name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>22</java.version>
+		<java.version>17</java.version>
 		<spring-modulith.version>1.2.0</spring-modulith.version>
 	</properties>
 	<dependencies>
