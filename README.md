@@ -16,7 +16,7 @@
 
 **ShopSphere** is a full-stack marketplace where buyers can discover and purchase products, sellers can manage their storefronts, and admins oversee the entire platform.
 
-Designed with clean architecture, strong security, and scalability in mind — built by [Yosr Fourati](https://github.com/yosr-fourati), MS Software Engineering student at **Oakland University** (graduating April 2026).
+Designed with clean architecture, strong security, and scalability in mind.
 
 ---
 
