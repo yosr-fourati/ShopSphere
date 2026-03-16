@@ -1,0 +1,56 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: TunisiCart
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3307/TunisiCartDB}
+    username: ${DB_USERNAME:aeisel}
+    password: ${DB_PASSWORD:azerty}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:ismail}
+    password: ${MAIL_PASSWORD:ismail}
+    properties:
+      mail:
+        smtp:
+          trust: "*"
+          auth: true
+          starttls:
+            enable: true
+          reconnection: 5000
+          timeout: 3000
+          rewriterule: 5000
+
+springdoc:
+  default-produces-media-type: application/json
+  servlet:
+    max-file-size: 50MB
+
+application:
+  security:
+    jwt:
+      mailing:
+        frontend:
+          activation-url: ${FRONTEND_ACTIVATION_URL:http://localhost:4200/activate-account}
+      secret-key: ${JWT_SECRET}
+      expiration: ${JWT_EXPIRATION:86400000}
+      refresh-token:
+        expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+    file:
+      uploads:
+        photos-output-path: ./uploads
+  stripe:
+    secret-key: ${STRIPE_SECRET_KEY}
+
+server:
+  port: 8088
+  servlet:
+    context-path: /api/v1/
