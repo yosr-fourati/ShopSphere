@@ -90,12 +90,14 @@ export interface RegisterRequest {
   firstname: string;
   lastname: string;
   email: string;
+  dateOfBirth: string;
   password: string;
+  role: string;
 }
 
 export interface AuthResponse {
-  access_token: string;
-  refresh_token: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface CartItemRequest {
@@ -106,7 +108,29 @@ export interface CartItemRequest {
 export interface OrderRequest {
   userId: number;
   item_id: number[];
+  totalAmount?: number;
   stripeToken?: string;
+}
+
+export interface GuestCartItem {
+  item: Item;
+  quantity: number;
+}
+
+export interface DeliveryAddress {
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}
+
+export interface GuestOrderRequest {
+  guestName: string;
+  guestEmail: string;
+  item_id: number[];
+  totalAmount: number;
+  deliveryAddress: DeliveryAddress;
 }
 
 export interface ItemRequest {

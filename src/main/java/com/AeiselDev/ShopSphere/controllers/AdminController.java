@@ -134,6 +134,25 @@ public class AdminController {
         return ResponseEntity.ok("Item deleted successfully");
     }
 
+    // Seller Approval Endpoints
+
+    @GetMapping("/sellers/pending")
+    public ResponseEntity<?> getPendingSellers() {
+        return ResponseEntity.ok(adminService.getPendingSellers());
+    }
+
+    @PutMapping("/sellers/{id}/approve")
+    public ResponseEntity<?> approveSeller(@PathVariable Long id) {
+        adminService.approveSeller(id);
+        return ResponseEntity.ok("Seller approved successfully");
+    }
+
+    @PutMapping("/sellers/{id}/reject")
+    public ResponseEntity<?> rejectSeller(@PathVariable Long id) {
+        adminService.rejectSeller(id);
+        return ResponseEntity.ok("Seller rejected");
+    }
+
     // Other Administrative Tasks
 
     @GetMapping("/stats")

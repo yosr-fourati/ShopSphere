@@ -1,5 +1,6 @@
 package com.AeiselDev.ShopSphere.services;
 
+import com.AeiselDev.ShopSphere.common.GuestOrderRequest;
 import com.AeiselDev.ShopSphere.common.OrderRequest;
 import com.AeiselDev.ShopSphere.entities.Item;
 import com.AeiselDev.ShopSphere.entities.PurchaseOrder;
@@ -70,6 +71,20 @@ public class OrderService {
             purchaseOrderRepository.save(order);
 
         }
+    }
+
+    public void placeGuestOrder(GuestOrderRequest request) {
+        List<Item> items = itemService.getItemsByIds(request.getItem_id());
+        PurchaseOrder order = new PurchaseOrder();
+        order.setItems(items);
+        order.setTotalAmount(request.getTotalAmount());
+        order.setStatus(DeliveryStatus.PENDING);
+        order.setDeliveryAddress(request.getDeliveryAddress());
+        order.setOrderDate(new Date(System.currentTimeMillis()));
+        order.setGuestEmail(request.getGuestEmail());
+        order.setGuestName(request.getGuestName());
+        order.setUser(null); // no user account for guest orders
+        purchaseOrderRepository.save(order);
     }
 
     public List<PurchaseOrder> getOrderHistory(Long userId) {

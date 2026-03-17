@@ -96,18 +96,12 @@ import { getProductImage } from '../../../core/utils/product-images';
 
             <!-- Actions -->
             <div class="flex gap-3">
-              @if (auth.isLoggedIn()) {
-                <button
-                  (click)="addToCart()"
-                  [disabled]="product()!.quantity === 0 || adding()"
-                  class="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed">
-                  {{ adding() ? 'Adding...' : '🛒 Add to Cart' }}
-                </button>
-              } @else {
-                <a routerLink="/auth/login" class="btn-primary flex-1 text-center">
-                  Sign In to Buy
-                </a>
-              }
+              <button
+                (click)="addToCart()"
+                [disabled]="product()!.quantity === 0 || adding()"
+                class="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                {{ adding() ? 'Adding...' : '🛒 Add to Cart' }}
+              </button>
               <a routerLink="/products" class="btn-secondary px-4">← Back</a>
             </div>
 
@@ -214,17 +208,27 @@ export class ProductDetailComponent implements OnInit {
   }
 
   addToCart() {
-    const userId = this.auth.getUserId();
-    if (!userId || !this.product()) return;
-    this.adding.set(true);
-    this.cartService.addToCart(userId, { itemId: this.product()!.id, quantity: this.qty }).subscribe({
-      next: () => {
-        this.adding.set(false);
-        this.addedToCart.set(true);
-        setTimeout(() => this.addedToCart.set(false), 3000);
-      },
-      error: () => this.adding.set(false)
-    });
+    const product = this.product();
+    if (!product) return;
+
+    if (this.auth.isLoggedIn()) {
+      const userId = this.auth.getUserId();
+      if (!userId) return;
+      this.adding.set(true);
+      this.cartService.addToCart(userId, { itemId: product.id, quantity: this.qty }).subscribe({
+        next: () => {
+          this.adding.set(false);
+          this.addedToCart.set(true);
+          setTimeout(() => this.addedToCart.set(false), 3000);
+        },
+        error: () => this.adding.set(false)
+      });
+    } else {
+      // Guest: add to localStorage cart instantly (no API call needed)
+      this.cartService.addGuestItem(product, this.qty);
+      this.addedToCart.set(true);
+      setTimeout(() => this.addedToCart.set(false), 3000);
+    }
   }
 
   submitReview() {

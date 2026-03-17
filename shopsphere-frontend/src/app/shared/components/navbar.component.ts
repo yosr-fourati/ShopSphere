@@ -40,24 +40,30 @@ import { CartService } from '../../core/services/cart.service';
                 Dashboard
               </a>
             }
+            @if (auth.isLoggedIn() && auth.getUserRole() === 'ADMIN') {
+              <a routerLink="/admin" routerLinkActive="text-primary-600"
+                 class="text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors">
+                Admin
+              </a>
+            }
           </div>
 
           <!-- Right side -->
           <div class="flex items-center gap-3">
-            @if (auth.isLoggedIn()) {
-              <!-- Cart -->
-              <a routerLink="/cart" class="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                </svg>
-                @if (cartService.cartCount() > 0) {
-                  <span class="absolute -top-1 -right-1 w-4 h-4 bg-primary-600 text-white text-xs rounded-full flex items-center justify-center">
-                    {{ cartService.cartCount() }}
-                  </span>
-                }
-              </a>
+            <!-- Cart (visible to everyone) -->
+            <a routerLink="/cart" class="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
+              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+              @if (cartService.cartCount() > 0) {
+                <span class="absolute -top-1 -right-1 w-4 h-4 bg-primary-600 text-white text-xs rounded-full flex items-center justify-center">
+                  {{ cartService.cartCount() }}
+                </span>
+              }
+            </a>
 
+            @if (auth.isLoggedIn()) {
               <!-- Orders -->
               <a routerLink="/orders" class="hidden md:block text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors">
                 Orders
@@ -96,7 +102,7 @@ import { CartService } from '../../core/services/cart.service';
                 Sign in
               </a>
               <a routerLink="/auth/register" class="btn-primary text-sm py-2 px-4">
-                Get Started
+                Sell on ShopSphere
               </a>
             }
           </div>

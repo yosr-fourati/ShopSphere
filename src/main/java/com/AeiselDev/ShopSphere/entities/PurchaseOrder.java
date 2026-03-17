@@ -30,8 +30,12 @@ public class PurchaseOrder {
 
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false) // assuming a purchase order must have a user
+    @JoinColumn(name = "user_id", nullable = true) // nullable to support guest orders
     private User user;
+
+    // Guest order fields (null for authenticated users)
+    private String guestEmail;
+    private String guestName;
 
     @OneToMany(mappedBy = "purchaseOrder") //cascade = CascadeType.ALL, orphanRemoval = false
     private List<Item> items;

@@ -86,7 +86,7 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .dateOfBirth(request.getDateOfBirth())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .accountLocked(false)
+                .accountLocked(RoleType.SELLER.name().equals(request.getRole())) // sellers need admin approval
                 .enabled(false)
                 .registrationDate(LocalDate.now())
                 .role(role) //userRoleEntity
@@ -109,6 +109,8 @@ public class AuthenticationService {
         var claims = new HashMap<String, Object>();
         var user = ((User) auth.getPrincipal());
         claims.put("fullName", user.getFullName());
+        claims.put("userId", user.getId());
+        claims.put("role", user.getRole().getName().name());
 
         // Update lastLogin field
         Optional<User> actualUser = userRepository.findByEmail(request.getEmail());

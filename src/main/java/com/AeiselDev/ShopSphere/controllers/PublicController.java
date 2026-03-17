@@ -1,8 +1,10 @@
 package com.AeiselDev.ShopSphere.controllers;
 
+import com.AeiselDev.ShopSphere.common.GuestOrderRequest;
 import com.AeiselDev.ShopSphere.entities.Item;
 import com.AeiselDev.ShopSphere.services.ActivityHistoryService;
 import com.AeiselDev.ShopSphere.services.ItemService;
+import com.AeiselDev.ShopSphere.services.OrderService;
 import com.AeiselDev.ShopSphere.services.PublicService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class PublicController {
     private final ItemService itemService;
     private final PublicService publicService;
     private final ActivityHistoryService activityHistoryService;
+    private final OrderService orderService;
 
     @GetMapping("/items")
     public ResponseEntity<Page<Item>> getAllItems(
@@ -71,5 +74,11 @@ public class PublicController {
     @GetMapping("/sellers")
     public ResponseEntity<?> getAllSellers() {
         return ResponseEntity.ok(publicService.getAllSellers());
+    }
+
+    @PostMapping("/orders")
+    public ResponseEntity<?> placeGuestOrder(@RequestBody GuestOrderRequest request) {
+        orderService.placeGuestOrder(request);
+        return ResponseEntity.ok("Order placed successfully");
     }
 }

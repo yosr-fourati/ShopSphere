@@ -43,7 +43,13 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+    const token = localStorage.getItem(this.TOKEN_KEY);
+    if (!token || token === 'undefined' || token === 'null' || token.split('.').length !== 3) {
+      localStorage.removeItem(this.TOKEN_KEY);
+      localStorage.removeItem(this.REFRESH_KEY);
+      return null;
+    }
+    return token;
   }
 
   isLoggedIn(): boolean {
@@ -80,8 +86,8 @@ export class AuthService {
   }
 
   private storeTokens(res: AuthResponse): void {
-    localStorage.setItem(this.TOKEN_KEY, res.access_token);
-    localStorage.setItem(this.REFRESH_KEY, res.refresh_token);
+    localStorage.setItem(this.TOKEN_KEY, res.accessToken);
+    localStorage.setItem(this.REFRESH_KEY, res.refreshToken);
     this.loadUserFromToken();
   }
 

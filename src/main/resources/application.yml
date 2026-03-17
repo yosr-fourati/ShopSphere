@@ -16,20 +16,20 @@ spring:
     hibernate:
       ddl-auto: update
   mail:
-    host: ${MAIL_HOST:localhost}
-    port: ${MAIL_PORT:1025}
-    username: ${MAIL_USERNAME:ismail}
-    password: ${MAIL_PASSWORD:ismail}
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:shopsphere.notify@gmail.com}
+    password: ${MAIL_PASSWORD:your_gmail_app_password_here}
     properties:
       mail:
         smtp:
-          trust: "*"
+          trust: smtp.gmail.com
           auth: true
           starttls:
             enable: true
-          reconnection: 5000
-          timeout: 3000
-          rewriterule: 5000
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
 springdoc:
   default-produces-media-type: application/json
@@ -51,6 +51,7 @@ application:
         photos-output-path: ./uploads
   stripe:
     secret-key: ${STRIPE_SECRET_KEY}
+    publishable-key: ${STRIPE_PUBLISHABLE_KEY:pk_test_REPLACE_WITH_YOUR_PUBLISHABLE_KEY}
 
 server:
   port: 8088

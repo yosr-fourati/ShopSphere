@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, sellerGuard, guestGuard } from './core/guards/auth.guard';
+import { authGuard, sellerGuard, guestGuard, adminGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -35,7 +35,6 @@ export const routes: Routes = [
   },
   {
     path: 'cart',
-    canActivate: [authGuard],
     loadComponent: () => import('./features/cart/cart.component').then(m => m.CartComponent)
   },
   {
@@ -47,6 +46,11 @@ export const routes: Routes = [
     path: 'seller',
     canActivate: [sellerGuard],
     loadComponent: () => import('./features/seller/seller-dashboard.component').then(m => m.SellerDashboardComponent)
+  },
+  {
+    path: 'admin',
+    canActivate: [adminGuard],
+    loadComponent: () => import('./features/admin/admin-dashboard.component').then(m => m.AdminDashboardComponent)
   },
   {
     path: '**',

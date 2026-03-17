@@ -1,6 +1,7 @@
 package com.AeiselDev.ShopSphere.common;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +28,7 @@ public class RegistrationRequest {
     @NotNull(message = "Email is mandatory")
     private String email;
     @NotNull(message = "Date of birth is mandatory")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
     @NotEmpty(message = "Password is mandatory")
     @NotNull(message = "Password is mandatory")

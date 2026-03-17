@@ -107,12 +107,18 @@ export class LoginComponent {
       next: () => {
         this.loading.set(false);
         const role = this.auth.getUserRole();
-        if (role === 'SELLER') this.router.navigate(['/seller']);
+        if (role === 'ADMIN') this.router.navigate(['/admin']);
+        else if (role === 'SELLER') this.router.navigate(['/seller']);
         else this.router.navigate(['/']);
       },
       error: (err) => {
         this.loading.set(false);
-        if (err.status === 401 || err.status === 403) {
+        const msg: string = err.error?.message ?? err.error?.error ?? '';
+        if (msg.toLowerCase().includes('locked')) {
+          this.errorMsg.set('Your seller account is pending admin approval. You\'ll be able to log in once an admin approves your application.');
+        } else if (msg.toLowerCase().includes('disabled') || msg.toLowerCase().includes('enabled')) {
+          this.errorMsg.set('Please activate your account first. Check your email for the activation link.');
+        } else if (err.status === 401 || err.status === 403) {
           this.errorMsg.set('Invalid email or password.');
         } else if (err.status === 0) {
           this.errorMsg.set('Cannot connect to server. Make sure the backend is running.');

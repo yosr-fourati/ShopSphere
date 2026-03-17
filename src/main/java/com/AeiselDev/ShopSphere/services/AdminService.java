@@ -2,6 +2,7 @@ package com.AeiselDev.ShopSphere.services;
 
 import com.AeiselDev.ShopSphere.entities.DetailedSystemStats;
 import com.AeiselDev.ShopSphere.entities.User;
+import com.AeiselDev.ShopSphere.enums.RoleType;
 import com.AeiselDev.ShopSphere.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,27 @@ public class AdminService {
 
     // Delete a user by ID
     public void deleteUser(Long id) {
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("User not found with ID: " + id);
+        }
+    }
+
+    // Get pending sellers awaiting admin approval
+    public List<User> getPendingSellers() {
+        return userRepository.findPendingSellers(RoleType.SELLER);
+    }
+
+    // Approve a seller: unlock account so they can log in
+    public void approveSeller(Long id) {
+        User user = getUserById(id);
+        user.setAccountLocked(false);
+        userRepository.save(user);
+    }
+
+    // Reject a seller: delete the account
+    public void rejectSeller(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
         } else {

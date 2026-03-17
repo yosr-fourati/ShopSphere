@@ -48,8 +48,8 @@ public class SecurityConfig {
                                         "/public/**",
                                         "/image/**",
                                         "/feedback/**",
-                                        "/auth/refresh-token" // Permit access to this specific endpoint
-
+                                        "/payment/**",          // Stripe payment intents (guest + logged-in checkout)
+                                        "/auth/refresh-token"
                                 )
                                 .permitAll()
                                 .requestMatchers("/admin/**").hasRole(ADMIN.name())

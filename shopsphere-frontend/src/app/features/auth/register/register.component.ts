@@ -24,15 +24,50 @@ import { AuthService } from '../../../core/services/auth.service';
 
           @if (success()) {
             <div class="text-center py-6">
-              <div class="text-5xl mb-4">✉️</div>
-              <h2 class="text-xl font-bold text-gray-900 mb-2">Check your email!</h2>
-              <p class="text-gray-500 text-sm">
-                We sent an activation link to <strong>{{ email }}</strong>.
-                Click the link to activate your account.
-              </p>
+              @if (role === 'SELLER') {
+                <div class="text-5xl mb-4">🏪</div>
+                <h2 class="text-xl font-bold text-gray-900 mb-2">Almost there!</h2>
+                <p class="text-gray-500 text-sm mb-3">
+                  We sent an activation email to <strong>{{ email }}</strong>.
+                </p>
+                <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl text-left">
+                  <p class="text-sm text-amber-800 font-medium mb-1">Seller account — two steps to go:</p>
+                  <ol class="text-sm text-amber-700 space-y-1 list-decimal list-inside">
+                    <li>Activate your email (check your inbox)</li>
+                    <li>Wait for admin approval — you'll be able to log in once approved</li>
+                  </ol>
+                </div>
+              } @else {
+                <div class="text-5xl mb-4">✉️</div>
+                <h2 class="text-xl font-bold text-gray-900 mb-2">Check your email!</h2>
+                <p class="text-gray-500 text-sm">
+                  We sent an activation link to <strong>{{ email }}</strong>.
+                  Click the link to activate your account.
+                </p>
+              }
               <a routerLink="/auth/login" class="btn-primary mt-6 inline-block">Go to Sign In</a>
             </div>
           } @else {
+            <!-- Account type selector -->
+            <div class="flex rounded-xl border border-gray-200 overflow-hidden mb-6">
+              <button type="button"
+                      (click)="role = 'USER'"
+                      [class]="role === 'USER' ? 'flex-1 py-2.5 text-sm font-semibold bg-primary-600 text-white' : 'flex-1 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors'">
+                I'm a Buyer
+              </button>
+              <button type="button"
+                      (click)="role = 'SELLER'"
+                      [class]="role === 'SELLER' ? 'flex-1 py-2.5 text-sm font-semibold bg-primary-600 text-white' : 'flex-1 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors'">
+                I'm a Seller
+              </button>
+            </div>
+
+            @if (role === 'SELLER') {
+              <div class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+                Seller accounts require admin approval before you can list products. You'll be notified by email.
+              </div>
+            }
+
             <form (ngSubmit)="onSubmit()">
               <div class="space-y-4">
                 <div class="grid grid-cols-2 gap-3">
@@ -52,6 +87,12 @@ import { AuthService } from '../../../core/services/auth.service';
                   <label class="block text-sm font-medium text-gray-700 mb-1.5">Email address</label>
                   <input [(ngModel)]="email" name="email" type="email" required
                          placeholder="you@example.com" class="input-field"/>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">Date of birth</label>
+                  <input [(ngModel)]="dateOfBirth" name="dateOfBirth" type="date" required
+                         [max]="maxDate" class="input-field"/>
                 </div>
 
                 <div>
@@ -93,7 +134,7 @@ import { AuthService } from '../../../core/services/auth.service';
               }
 
               <button type="submit"
-                      [disabled]="loading() || !firstname || !lastname || !email || password.length < 8"
+                      [disabled]="loading() || !firstname || !lastname || !email || !dateOfBirth || password.length < 8"
                       class="btn-primary w-full mt-6 py-3 text-base disabled:opacity-50 disabled:cursor-not-allowed">
                 @if (loading()) {
                   <span class="inline-flex items-center gap-2">
@@ -104,7 +145,7 @@ import { AuthService } from '../../../core/services/auth.service';
                     Creating account...
                   </span>
                 } @else {
-                  Create Account
+                  {{ role === 'SELLER' ? 'Apply as Seller' : 'Create Account' }}
                 }
               </button>
             </form>
@@ -126,11 +167,16 @@ export class RegisterComponent {
   firstname = '';
   lastname = '';
   email = '';
+  dateOfBirth = '';
   password = '';
+  role = 'USER';
   showPwd = false;
   loading = signal(false);
   errorMsg = signal('');
   success = signal(false);
+
+  // Max date: user must be at least 13 years old
+  maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 13)).toISOString().split('T')[0];
 
   passwordStrength(): number {
     let score = 0;
@@ -143,7 +189,7 @@ export class RegisterComponent {
   }
 
   onSubmit() {
-    if (!this.firstname || !this.lastname || !this.email || this.password.length < 8) return;
+    if (!this.firstname || !this.lastname || !this.email || !this.dateOfBirth || this.password.length < 8) return;
     this.loading.set(true);
     this.errorMsg.set('');
 
@@ -151,7 +197,9 @@ export class RegisterComponent {
       firstname: this.firstname,
       lastname: this.lastname,
       email: this.email,
-      password: this.password
+      dateOfBirth: this.dateOfBirth,
+      password: this.password,
+      role: this.role
     }).subscribe({
       next: () => {
         this.loading.set(false);
@@ -160,7 +208,8 @@ export class RegisterComponent {
       error: (err) => {
         this.loading.set(false);
         if (err.status === 400) {
-          this.errorMsg.set('Invalid input. Please check your details.');
+          const msg = err.error?.validationErrors?.join(', ') || err.error?.error || 'Please check your details.';
+          this.errorMsg.set(msg);
         } else if (err.status === 409) {
           this.errorMsg.set('Email already registered. Try signing in.');
         } else if (err.status === 0) {

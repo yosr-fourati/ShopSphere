@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,29 +34,36 @@ public class DataSeeder implements ApplicationRunner {
     private final CategoryRepository categoryRepository;
     private final ItemRepository itemRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        // Always ensure all categories exist (runs on every startup)
+
+        // ── Fix nullable constraint for guest orders (safe to run on every startup) ──
+        fixGuestOrderConstraint();
+
+        // ── Always ensure categories exist ───────────────────────
         seedCategories();
 
+        // ── Always ensure roles exist ─────────────────────────────
+        Role userRole   = getOrCreateRole(RoleType.USER);
+        Role sellerRole = getOrCreateRole(RoleType.SELLER);
+        Role adminRole  = getOrCreateRole(RoleType.ADMIN);
+
+        // ── Always ensure admin account exists ───────────────────
+        createUser("Admin", "ShopSphere", "admin@shopsphere.com", "Admin1234!", adminRole);
+
         if (itemRepository.count() > 0) {
-            log.info("Database already contains data — skipping item/user seed.");
+            log.info("Database already seeded — skipping demo data.");
             return;
         }
 
         log.info("Seeding database with demo data...");
 
-        // ── Roles ────────────────────────────────────────────────
-        Role userRole   = getOrCreateRole(RoleType.USER);
-        Role sellerRole = getOrCreateRole(RoleType.SELLER);
-        Role adminRole  = getOrCreateRole(RoleType.ADMIN);
-
-        // ── Users ────────────────────────────────────────────────
-        createUser("Admin",   "ShopSphere", "admin@shopsphere.com",  "Admin1234!",  adminRole);
+        // ── Demo users ────────────────────────────────────────────
         User seller = createUser("Alex", "Carter", "seller@shopsphere.com", "Seller1234!", sellerRole);
-        createUser("Sarah", "Johnson",  "buyer@shopsphere.com",  "Buyer1234!",  userRole);
+        createUser("Sarah", "Johnson", "buyer@shopsphere.com", "Buyer1234!", userRole);
 
         // ── Items ────────────────────────────────────────────────
         Category electronics = getOrCreateCategory("Electronics",        "Gadgets, devices, and accessories");
@@ -176,10 +184,24 @@ public class DataSeeder implements ApplicationRunner {
 
         itemRepository.saveAll(items);
         log.info("✅ Seeded {} products across 8 categories.", items.size());
-        log.info("Test accounts ready:");
-        log.info("  admin@shopsphere.com  / Admin1234!  (ADMIN)");
-        log.info("  seller@shopsphere.com / Seller1234! (SELLER)");
-        log.info("  buyer@shopsphere.com  / Buyer1234!  (USER)");
+        log.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        log.info("  Admin account  → admin@shopsphere.com / Admin1234!");
+        log.info("  Seller account → seller@shopsphere.com / Seller1234!");
+        log.info("  Buyer account  → buyer@shopsphere.com  / Buyer1234!");
+        log.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    }
+
+    // ── Fix DB constraint: allow NULL user_id for guest orders ────
+    private void fixGuestOrderConstraint() {
+        try {
+            jdbcTemplate.execute(
+                "ALTER TABLE purchase_order MODIFY COLUMN user_id BIGINT NULL"
+            );
+            log.info("✅ purchase_order.user_id is now nullable — guest orders supported.");
+        } catch (Exception e) {
+            // Safe to ignore: column already nullable, or table not yet created
+            log.debug("ALTER TABLE purchase_order skipped (already nullable or table pending): {}", e.getMessage());
+        }
     }
 
     // ── Category seeding (runs on every startup) ─────────────────

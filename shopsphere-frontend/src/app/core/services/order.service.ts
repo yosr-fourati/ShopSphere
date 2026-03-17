@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Order, OrderRequest } from '../models';
+import { Order, OrderRequest, GuestOrderRequest } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
@@ -12,6 +12,10 @@ export class OrderService {
 
   placeOrder(request: OrderRequest): Observable<any> {
     return this.http.post(`${this.base}/user/orders`, request);
+  }
+
+  placeGuestOrder(request: GuestOrderRequest): Observable<any> {
+    return this.http.post(`${this.base}/public/orders`, request);
   }
 
   getOrderHistory(userId: number): Observable<Order[]> {
