@@ -27,6 +27,7 @@ public class AdminService {
     private final TokenRepository tokenRepository;
     private final ActivityHistoryRepository activityHistoryRepository;
     private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
     private final ItemRepository itemRepository;
 
     // Retrieve all users
@@ -68,10 +69,15 @@ public class AdminService {
         List<PurchaseOrder> orders = orderRepository.findByUserId(id);
         orders.forEach(o -> o.setUser(null));
         orderRepository.saveAll(orders);
-        // 4. Delete items owned by this user (feedbacks/images cascade automatically)
+        // 4. Delete cart items that reference this user's products (other users' carts)
         List<Item> items = itemRepository.findByUser_Id(id);
+        if (!items.isEmpty()) {
+            List<Long> itemIds = items.stream().map(Item::getId).collect(Collectors.toList());
+            cartItemRepository.deleteByItemIdIn(itemIds);
+        }
+        // 5. Delete items owned by this user (feedbacks/images cascade automatically)
         itemRepository.deleteAll(items);
-        // 5. Delete cart (cascades to cart items)
+        // 6. Delete the user's own cart (cascades to their cart items)
         cartRepository.findByUserId(id).ifPresent(cartRepository::delete);
         // 6. Delete the user
         userRepository.deleteById(id);

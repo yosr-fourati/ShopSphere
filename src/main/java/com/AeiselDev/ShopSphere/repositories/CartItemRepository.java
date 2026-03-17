@@ -13,8 +13,12 @@ import java.util.List;
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     List<CartItem> findByCart(Cart cart);
-    // You can define custom query methods here if needed
+
     @Modifying
     @Query("DELETE FROM CartItem ci WHERE ci.cart.id = :cartId")
     void deleteByCartId(int cartId);
+
+    @Modifying
+    @Query("DELETE FROM CartItem ci WHERE ci.item.id IN :itemIds")
+    void deleteByItemIdIn(@org.springframework.data.repository.query.Param("itemIds") java.util.List<Long> itemIds);
 }
