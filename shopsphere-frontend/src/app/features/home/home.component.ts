@@ -191,7 +191,7 @@ export class HomeComponent implements OnInit {
 
   stats = [
     { value: '24+', label: 'Products' },
-    { value: '8', label: 'Categories' },
+    { value: '18', label: 'Categories' },
     { value: '3', label: 'Sellers' },
   ];
 
