@@ -51,8 +51,17 @@ public class DataSeeder implements ApplicationRunner {
         Role sellerRole = getOrCreateRole(RoleType.SELLER);
         Role adminRole  = getOrCreateRole(RoleType.ADMIN);
 
-        // ── Always ensure admin account exists ───────────────────
-        createUser("Admin", "ShopSphere", "admin@shopsphere.com", "Admin1234!", adminRole);
+        // ── Always ensure admin account exists (upsert password on every restart) ──
+        userRepository.findByEmail("admin@shopsphere.com").ifPresentOrElse(
+            admin -> {
+                admin.setPassword(passwordEncoder.encode("Sph3re@Adm!n#2025"));
+                admin.setEnabled(true);
+                admin.setAccountLocked(false);
+                admin.setRole(adminRole);
+                userRepository.save(admin);
+            },
+            () -> createUser("Admin", "ShopSphere", "admin@shopsphere.com", "Sph3re@Adm!n#2025", adminRole)
+        );
 
         if (itemRepository.count() > 0) {
             log.info("Database already seeded — skipping demo data.");

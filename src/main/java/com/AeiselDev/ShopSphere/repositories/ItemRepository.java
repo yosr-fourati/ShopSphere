@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 public interface ItemRepository extends JpaRepository<Item, Long> {
     Page<Item> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
+    java.util.List<Item> findByUser_Id(Long userId);
+
     @Query("SELECT i FROM Item i WHERE " +
            "(:search IS NULL OR :search = '' OR LOWER(i.name) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
            "(:categoryId IS NULL OR i.category.id = :categoryId) AND " +

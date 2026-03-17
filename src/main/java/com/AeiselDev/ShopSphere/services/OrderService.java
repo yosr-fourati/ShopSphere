@@ -90,4 +90,11 @@ public class OrderService {
     public List<PurchaseOrder> getOrderHistory(Long userId) {
         return purchaseOrderRepository.findByUserId(userId);
     }
+
+    public void updateOrderStatus(Long id, String status) {
+        PurchaseOrder order = purchaseOrderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setStatus(DeliveryStatus.valueOf(status));
+        purchaseOrderRepository.save(order);
+    }
 }

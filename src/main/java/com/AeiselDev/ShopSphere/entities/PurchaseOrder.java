@@ -2,6 +2,7 @@ package com.AeiselDev.ShopSphere.entities;
 
 import com.AeiselDev.ShopSphere.enums.DeliveryStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,4 +46,13 @@ public class PurchaseOrder {
 
     // Other fields like payment method, discount, etc.
 
+    @JsonProperty("userEmail")
+    public String getUserEmail() {
+        return user != null ? user.getEmail() : null;
+    }
+
+    @JsonProperty("userName")
+    public String getUserName() {
+        return user != null ? user.getFullName() : null;
+    }
 }

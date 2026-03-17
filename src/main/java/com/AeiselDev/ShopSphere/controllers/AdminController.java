@@ -7,6 +7,7 @@ import com.AeiselDev.ShopSphere.entities.Item;
 import com.AeiselDev.ShopSphere.entities.Role;
 import com.AeiselDev.ShopSphere.entities.User;
 import com.AeiselDev.ShopSphere.services.AdminService;
+import com.AeiselDev.ShopSphere.services.OrderService;
 import com.AeiselDev.ShopSphere.services.ProfileService;
 import com.AeiselDev.ShopSphere.services.RoleService;
 import com.AeiselDev.ShopSphere.services.ItemService;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 import java.util.List;
 
@@ -31,6 +34,7 @@ public class AdminController {
     private final RoleService roleService;
     private final ItemService itemService;
     private final ProfileService profileService;
+    private final OrderService orderService;
 
     // Profile Endpoints
 
@@ -159,5 +163,18 @@ public class AdminController {
     public ResponseEntity<DetailedSystemStats> getSystemStats() {
         DetailedSystemStats stats = adminService.getSystemStats();
         return ResponseEntity.ok(stats);
+    }
+
+    // Orders Management Endpoints
+
+    @GetMapping("/orders")
+    public ResponseEntity<?> getAllOrders() {
+        return ResponseEntity.ok(orderService.getAllOrders());
+    }
+
+    @PutMapping("/orders/{id}/status")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        orderService.updateOrderStatus(id, body.get("status"));
+        return ResponseEntity.ok("Order status updated");
     }
 }

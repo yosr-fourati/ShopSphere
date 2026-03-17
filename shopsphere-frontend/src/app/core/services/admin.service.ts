@@ -15,6 +15,26 @@ export interface SystemStats {
   averageRating: number;
 }
 
+export interface AdminOrder {
+  id: number;
+  orderDate: string;
+  status: string;
+  totalAmount: number;
+  userEmail: string | null;
+  userName: string | null;
+  guestEmail: string | null;
+  guestName: string | null;
+}
+
+export interface AdminItem {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  quantity: number;
+  category: { id: number; name: string };
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private base = `${environment.apiUrl}/admin`;
@@ -31,6 +51,22 @@ export class AdminService {
 
   deleteUser(id: number): Observable<any> {
     return this.http.delete(`${this.base}/users/${id}`);
+  }
+
+  getAllOrders(): Observable<AdminOrder[]> {
+    return this.http.get<AdminOrder[]>(`${this.base}/orders`);
+  }
+
+  updateOrderStatus(id: number, status: string): Observable<any> {
+    return this.http.put(`${this.base}/orders/${id}/status`, { status });
+  }
+
+  getAllItems(page = 0, size = 50): Observable<any> {
+    return this.http.get<any>(`${this.base}/items?page=${page}&size=${size}`);
+  }
+
+  deleteItem(id: number): Observable<any> {
+    return this.http.delete(`${this.base}/items/${id}`);
   }
 
   getPendingSellers(): Observable<User[]> {

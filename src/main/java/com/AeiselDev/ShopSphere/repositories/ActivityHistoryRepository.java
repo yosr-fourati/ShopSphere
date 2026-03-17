@@ -13,4 +13,6 @@ public interface ActivityHistoryRepository extends JpaRepository<ActivityHistory
     List<ActivityHistory> findByProductId(Long productId);
 
     List<ActivityHistory> findByUserId(Long userId);
+
+    void deleteByUserId(Long userId);
 }

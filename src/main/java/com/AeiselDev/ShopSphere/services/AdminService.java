@@ -3,9 +3,13 @@ package com.AeiselDev.ShopSphere.services;
 import com.AeiselDev.ShopSphere.entities.DetailedSystemStats;
 import com.AeiselDev.ShopSphere.entities.User;
 import com.AeiselDev.ShopSphere.enums.RoleType;
+import com.AeiselDev.ShopSphere.entities.ActivityHistory;
+import com.AeiselDev.ShopSphere.entities.Item;
+import com.AeiselDev.ShopSphere.entities.PurchaseOrder;
 import com.AeiselDev.ShopSphere.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +24,10 @@ public class AdminService {
     private final UserRepository userRepository;
     private final PurchaseOrderRepository orderRepository;
     private final FeedbackRepository feedbackRepository;
+    private final TokenRepository tokenRepository;
+    private final ActivityHistoryRepository activityHistoryRepository;
+    private final CartRepository cartRepository;
+    private final ItemRepository itemRepository;
 
     // Retrieve all users
     public List<User> getAllUsers() {
@@ -46,13 +54,27 @@ public class AdminService {
         }
     }
 
-    // Delete a user by ID
+    // Delete a user by ID — cleans up all related records first
+    @Transactional
     public void deleteUser(Long id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-        } else {
+        if (!userRepository.existsById(id)) {
             throw new RuntimeException("User not found with ID: " + id);
         }
+        // 1. Delete activation tokens
+        tokenRepository.deleteByUserId(id.intValue());
+        // 2. Delete activity history
+        activityHistoryRepository.deleteByUserId(id);
+        // 3. Nullify purchase orders (keep order history, remove user reference)
+        List<PurchaseOrder> orders = orderRepository.findByUserId(id);
+        orders.forEach(o -> o.setUser(null));
+        orderRepository.saveAll(orders);
+        // 4. Delete items owned by this user (feedbacks/images cascade automatically)
+        List<Item> items = itemRepository.findByUser_Id(id);
+        itemRepository.deleteAll(items);
+        // 5. Delete cart (cascades to cart items)
+        cartRepository.findByUserId(id).ifPresent(cartRepository::delete);
+        // 6. Delete the user
+        userRepository.deleteById(id);
     }
 
     // Get pending sellers awaiting admin approval
