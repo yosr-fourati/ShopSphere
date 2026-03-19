@@ -1,4 +1,4 @@
-# ShopSphere 🛒
+# ShopSphere 
 
 A full-stack multi-seller e-commerce platform I built to practice real-world backend + frontend integration. It covers the full lifecycle of an online marketplace : buyer browsing, seller storefronts, Stripe payments, email activation, and a complete admin dashboard.
 
@@ -76,8 +76,8 @@ flowchart TD
 
 ## Features
 
-| | Feature | How it works |
-|-|---------|--------------|
+ | Feature | How it works |
+ |---------|--------------|
  | **Guest checkout** | Cart lives in localStorage, no login required. Stripe handles payment. |
  | **Stripe payments** | PaymentIntent API : card data never touches my server (PCI-compliant) |
  | **JWT auth** | Access + refresh tokens, email activation link on register |
