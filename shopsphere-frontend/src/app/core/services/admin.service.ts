@@ -6,10 +6,12 @@ import { User } from '../models';
 
 export interface SystemStats {
   totalUsers: number;
+  totalSellers: number;
+  totalProducts: number;
   activeUsers: number;
   newUsers: number;
   totalOrders: number;
-  totalSales: number;
+  totalSales: number;           // Platform GMV — total seller sales volume
   averageOrderValue: number;
   orderStatusCount: Record<string, number>;
   averageRating: number;

@@ -13,10 +13,12 @@ import java.util.Map;
 @AllArgsConstructor
 public class DetailedSystemStats {
     private int totalUsers;
+    private int totalSellers;
+    private int totalProducts;
     private int activeUsers;
     private int newUsers;
     private long totalOrders;
-    private double totalSales;
+    private double totalSales;      // Platform GMV — total sales volume across all sellers
     private double averageOrderValue;
     private Map<String, Long> orderStatusCount;
     private double averageRating;

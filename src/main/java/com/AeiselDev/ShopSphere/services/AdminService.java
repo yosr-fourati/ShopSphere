@@ -107,12 +107,14 @@ public class AdminService {
     // Get system statistics (e.g., user count, system health, etc.)
     public DetailedSystemStats getSystemStats() {
         int totalUsers = (int) userRepository.count();
+        int totalSellers = (int) userRepository.countActiveSellers(RoleType.SELLER);
+        int totalProducts = (int) itemRepository.count();
         int activeUsers = (int) userRepository.findByLastLoginAfter(LocalDate.now().minusMonths(1)).size();
         int newUsers = (int) userRepository.findByRegistrationDateAfter(LocalDate.now().minusWeeks(1)).size();
 
         long totalOrders = orderRepository.count();
         Double rawSales = orderRepository.sumTotalAmount();
-        double totalSales = rawSales != null ? rawSales : 0.0;
+        double totalSales = rawSales != null ? rawSales : 0.0;   // Platform GMV
         double averageOrderValue = totalOrders > 0 ? totalSales / totalOrders : 0;
 
         List<Object[]> statusRows = orderRepository.countOrdersByStatus();
@@ -126,15 +128,17 @@ public class AdminService {
         Double rawRating = feedbackRepository.findAverageRating();
         double averageRating = rawRating != null ? rawRating : 0.0;
 
-         DetailedSystemStats stats = new DetailedSystemStats(
-                 totalUsers,
-                 activeUsers,
-                 newUsers,
-                 totalOrders,
-                 totalSales,
-                 averageOrderValue,
-                 cleanedOrderStatusCount,
-                 averageRating
+        DetailedSystemStats stats = new DetailedSystemStats(
+                totalUsers,
+                totalSellers,
+                totalProducts,
+                activeUsers,
+                newUsers,
+                totalOrders,
+                totalSales,
+                averageOrderValue,
+                cleanedOrderStatusCount,
+                averageRating
         );
         return stats;
     }

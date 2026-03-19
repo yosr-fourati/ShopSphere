@@ -33,26 +33,29 @@ const STATUS_COLORS: Record<string, string> = {
       <!-- Stats Cards -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         @if (stats()) {
+          <!-- Registered users on the platform -->
           <div class="card p-5 border-l-4 border-primary-500">
             <p class="text-2xl font-bold text-gray-900">{{ stats()!.totalUsers }}</p>
-            <p class="text-xs text-gray-500 mt-0.5">Total Users</p>
+            <p class="text-sm font-medium text-gray-700 mt-0.5">Registered Users</p>
+            <p class="text-xs text-gray-400 mt-0.5">Buyers on the platform</p>
           </div>
+          <!-- Active approved sellers -->
+          <div class="card p-5 border-l-4 border-blue-500">
+            <p class="text-2xl font-bold text-gray-900">{{ stats()!.totalSellers }}</p>
+            <p class="text-sm font-medium text-gray-700 mt-0.5">Active Sellers</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ stats()!.totalProducts }} products listed</p>
+          </div>
+          <!-- Total orders placed -->
           <div class="card p-5 border-l-4 border-green-500">
             <p class="text-2xl font-bold text-gray-900">{{ stats()!.totalOrders }}</p>
-            <p class="text-xs text-gray-500 mt-0.5">Total Orders</p>
+            <p class="text-sm font-medium text-gray-700 mt-0.5">Total Orders</p>
+            <p class="text-xs text-gray-400 mt-0.5">Avg. \${{ stats()!.averageOrderValue | number:'1.2-2' }} / order</p>
           </div>
-          <div class="card p-5 border-l-4 border-blue-500">
+          <!-- Platform GMV = total seller sales, NOT admin earnings -->
+          <div class="card p-5 border-l-4 border-emerald-500">
             <p class="text-2xl font-bold text-gray-900">\${{ (stats()!.totalSales || 0) | number:'1.0-0' }}</p>
-            <p class="text-xs text-gray-500 mt-0.5">Total Revenue</p>
-          </div>
-          <div class="card p-5 border-l-4 border-amber-500 relative">
-            <p class="text-2xl font-bold text-gray-900">{{ pendingSellers().length }}</p>
-            <p class="text-xs text-gray-500 mt-0.5">Pending Sellers</p>
-            @if (pendingSellers().length > 0) {
-              <span class="absolute top-3 right-3 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                {{ pendingSellers().length }}
-              </span>
-            }
+            <p class="text-sm font-medium text-gray-700 mt-0.5">Platform GMV</p>
+            <p class="text-xs text-gray-400 mt-0.5">Gross seller sales volume</p>
           </div>
         } @else {
           @for (i of [1,2,3,4]; track i) {
@@ -101,14 +104,23 @@ const STATUS_COLORS: Record<string, string> = {
               </div>
             </div>
             <div class="card p-6">
-              <h2 class="font-bold text-gray-900 mb-4">Platform Health</h2>
+              <h2 class="font-bold text-gray-900 mb-1">Platform Metrics</h2>
+              <p class="text-xs text-gray-400 mb-4">Revenue belongs to individual sellers — GMV is the total marketplace sales volume</p>
               <div class="space-y-3">
                 <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span class="text-sm text-gray-600">Active users (30d)</span>
+                  <span class="text-sm text-gray-600">Active sellers</span>
+                  <span class="font-semibold text-blue-600">{{ stats()!.totalSellers }}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span class="text-sm text-gray-600">Products listed</span>
+                  <span class="font-semibold text-gray-900">{{ stats()!.totalProducts }}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span class="text-sm text-gray-600">Active buyers (30d)</span>
                   <span class="font-semibold text-gray-900">{{ stats()!.activeUsers }}</span>
                 </div>
                 <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span class="text-sm text-gray-600">New users (7d)</span>
+                  <span class="text-sm text-gray-600">New signups (7d)</span>
                   <span class="font-semibold text-green-600">+{{ stats()!.newUsers }}</span>
                 </div>
                 <div class="flex justify-between items-center py-2 border-b border-gray-100">

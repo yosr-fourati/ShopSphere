@@ -22,4 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.role.name = :roleType AND u.accountLocked = true AND u.enabled = true")
     List<User> findPendingSellers(@Param("roleType") RoleType roleType);
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.role.name = :roleType AND u.accountLocked = false")
+    long countActiveSellers(@Param("roleType") RoleType roleType);
 }
